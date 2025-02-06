@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lucid.Database\Lucid.Database.csproj" />
+    <ProjectReference Include="..\Lucid.Models\Lucid.Models.csproj" />
+    <ProjectReference Include="..\Lucid.Repositories.Abastruction\Lucid.Repositories.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,104 @@
+﻿@model Lucid.Web.Models.Customer.CustomerCreateVm
+@{
+    ViewData["Title"] = "Create";
+}
+
+<style>
+    .card-title {
+        float: none;
+        text-align: center;
+        margin: 0;
+    }
+</style>
+<div class="row pt-1">
+    <div class="card card-info">
+        <div class="card-header">
+            <h3 class="card-title">Add New Custome</h3>
+        </div>
+        <form class="form-horizontal" asp-action="Create">
+            <div class="card-body">
+                <div asp-validation-summary="ModelOnly" class="text-danger row"></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="CustomerNo" class="control-label"></label>
+                            <input asp-for="CustomerNo" class="form-control" />
+                            <span asp-validation-for="CustomerNo" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Mobile" class="control-label"></label>
+                            <input asp-for="Mobile" class="form-control" />
+                            <span asp-validation-for="Mobile" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Price" class="control-label"></label>
+                            <input asp-for="Price" class="form-control" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="StockJar" class="control-label"></label>
+                            <input asp-for="StockJar" class="form-control" />
+                            <span asp-validation-for="StockJar" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="DueAmount" class="control-label"></label>
+                            <input asp-for="DueAmount" class="form-control" />
+                            <span asp-validation-for="DueAmount" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="VanId" class="control-label"></label>
+                            <select asp-for="VanId" asp-items="Model.VanSelectList" class="form-control">
+                                <option>--Select--</option>
+                            </select>
+                            <span asp-validation-for="VanId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="LastSaleDate"> </label>
+                            <input type="text" class="form-control datetimepicker-input" asp-for="LastSaleDate" id="datePicker" data-toggle="datetimepicker"/>
+                        </div>                        
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label asp-for="Address" class="control-label"></label>
+                            <textarea asp-for="Address" class="form-control"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                <button type="submit" class="btn btn-info">Save</button>
+                <a class="btn btn-default float-right" asp-action="Index">Back</a>
+            </div>
+            <!-- /.card-footer -->
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial">
+}

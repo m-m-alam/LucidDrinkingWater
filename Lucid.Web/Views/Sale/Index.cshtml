@@ -1,0 +1,64 @@
+﻿@model IEnumerable<Lucid.Web.Models.Sales.ListSaleVm>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="row">
+    <div class="col-12">
+        <!-- /.card -->
+        <div class="card">
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="listdatatbl" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.SaleDate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Customer)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.TotalAmount)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Payment)
+                            </th>
+                           
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@(item.SaleDate.ToString("dd-MM-yyyy"))
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Customer)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TotalAmount)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Payment)
+                                </td>
+                               
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+<!-- /.row -->
