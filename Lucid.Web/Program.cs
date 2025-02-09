@@ -29,12 +29,15 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
 builder.Services.AddTransient<ICustomerService, CustomerService>();
 
 builder.Services.AddTransient<IVanRepository, VanRepository>();
 builder.Services.AddTransient<IVanService, VanService>();
+
 builder.Services.AddTransient<ICurrentUserService, CurrentUserService>();
+
 builder.Services.AddTransient<ICustomerTypeService, CustomerTypeService>();
 builder.Services.AddTransient<ICustomerTypeRepository, CustomerTypeRepository>();
 
@@ -49,6 +52,9 @@ builder.Services.AddTransient<IPaymentRepository, PaymentRepository>();
 
 builder.Services.AddTransient<IExpenseTypeService, ExpenseTypeService>();
 builder.Services.AddTransient<IExpenseTypeRepository, ExpenseTypeRepository>();
+
+builder.Services.AddTransient<IExpenseService, ExpenseService>();
+builder.Services.AddTransient<IExpenseRepository, ExpenseRepository>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 

@@ -6,6 +6,7 @@ using Lucid.Web.Models.VanModels;
 using Lucid.Web.Models.ProductModels;
 using Lucid.Web.Models.Sales;
 using Lucid.Web.Models.ExpenseTypeModels;
+using Lucid.Web.Models.ExpenseModels;
 
 namespace Lucid.Web.AutoMapperProfile
 {
@@ -61,6 +62,13 @@ namespace Lucid.Web.AutoMapperProfile
             CreateMap<CreateExpenseTypeVm, ExpenseType>();
             CreateMap<ExpenseType, EditExpenseTypeVm>();
             CreateMap<EditExpenseTypeVm, ExpenseType>();
+            
+             CreateMap<Expense, ListExpenseVm>();
+            CreateMap<ListExpenseVm, Expense>();
+            CreateMap<Expense, CreateExpenseVm>();
+            CreateMap<CreateExpenseVm, Expense>();
+            CreateMap<Expense, EditExpenseVm>();
+            CreateMap<EditExpenseVm, Expense>();
             
 
 

@@ -18,6 +18,6 @@ namespace Lucid.Database
         public DbSet<Sale> Sales { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<ExpenseType> ExpenseTypes { get; set; }
-        //public DbSet<Expense> Expenses { get; set; }
+        public DbSet<Expense> Expenses { get; set; }
     }
 }
