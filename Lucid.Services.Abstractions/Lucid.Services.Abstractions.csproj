@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lucid.Repositories.Abastruction\Lucid.Repositories.Abstractions.csproj" />
+    <ProjectReference Include="..\Lucid.ViewModel\Lucid.ViewModel.csproj" />
   </ItemGroup>
 
 </Project>

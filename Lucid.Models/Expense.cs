@@ -1,6 +1,6 @@
 ﻿namespace Lucid.Models
 {
-    public class Expense
+    public class Expense : AuditableEntity
     {
         public int Id { get; set; }
         public int ExpenseTypeId { get; set; }

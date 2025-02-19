@@ -14,11 +14,12 @@ namespace Lucid.Web.Controllers
         private readonly ICustomerService _customerService;
         private readonly IProductService _productService;
         private readonly ISaleService _service;
+        private readonly IStockService _stockService;
         private readonly IPaymentService _paymentService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IMapper _mapper;
 
-        public SaleController(ISaleService service, ICustomerService customerService, IMapper mapper, IProductService productService, ICurrentUserService currentUserService, IPaymentService paymentService)
+        public SaleController(ISaleService service, ICustomerService customerService, IMapper mapper, IProductService productService, ICurrentUserService currentUserService, IPaymentService paymentService, IStockService stockService)
         {
             _service = service;
             _mapper = mapper;
@@ -26,6 +27,7 @@ namespace Lucid.Web.Controllers
             _customerService = customerService;
             _currentUserService = currentUserService;
             _paymentService = paymentService;
+            _stockService = stockService;
         }
         public IActionResult Index()
         {
@@ -54,17 +56,29 @@ namespace Lucid.Web.Controllers
                     entity.SaleDetails = saleDetails;
                     entity.CreatedBy = _currentUserService.UserId;
                     entity.CreatedOn = DateTime.Now;
+                    entity.InvoiceNo = (_service.GetAll().Count() +1).ToString();
                     _service.Add(entity);
 
                     var customer = _customerService.GetById(model.CustomerId);
                     customer.DueAmount = (customer.DueAmount + (model.TotalAmount - (model.Discount.GetValueOrDefault() + model.Payment.GetValueOrDefault())));
+                    var stocks = new List<Stock>();
+                    
                     foreach (var item in model.SaleDetails)
                     {
                         var product = _productService.GetById(item.ProductId);
                         if (product.Name == "Water Jar")
                         {
+
                             customer.StockJar = item.Stock.GetValueOrDefault();
                             customer.LastSaleDate = model.SaleDate;
+                            var stock = _stockService.GetById(item.ProductId);
+                            stock.Quantity = stock.Quantity - (item.Delivery.GetValueOrDefault() - item.Return.GetValueOrDefault());
+                            _stockService.Update(stock);
+                        }
+                        else {
+                            var stock = _stockService.GetById(item.ProductId);
+                            stock.Quantity = stock.Quantity - item.Delivery.GetValueOrDefault();
+                            _stockService.Update(stock);
                         }
                     }
                     if (model.Payment > 0)
@@ -85,8 +99,9 @@ namespace Lucid.Web.Controllers
                     return RedirectToAction("Index");
                 }
             }
-            catch (Exception ex) 
-            { 
+            catch(Exception ex) 
+            {
+                int x = 0;
             }
 
             model.Customers = new SelectList(_customerService.GetAll().ToList(), "Id", "Name");

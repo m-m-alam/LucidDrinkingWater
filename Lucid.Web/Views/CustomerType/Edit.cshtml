@@ -1,6 +1,7 @@
 ﻿@model Lucid.Web.Models.CustomerTypes.CustomerTypeEditVm
 @{
     ViewData["Title"] = "Edit";
+    var existModel = TempData["existModel"];
 }
 
 <div class="row pt-4">
@@ -9,6 +10,10 @@
         <div class="card card-info">            
             <form class="form-horizontal" asp-action="Edit">
                 <div class="card-body">
+                    @if (existModel != null)
+                    {
+                        <h2 class="text-danger">@existModel</h2>
+                    }
                     <div asp-validation-summary="ModelOnly" class="text-danger row"></div>
                     <div class="form-group row">
                         <label asp-for="Name" class="col-sm-3 control-label"></label>

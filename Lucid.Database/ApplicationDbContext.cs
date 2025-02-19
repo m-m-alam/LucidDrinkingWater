@@ -19,5 +19,8 @@ namespace Lucid.Database
         public DbSet<Payment> Payments { get; set; }
         public DbSet<ExpenseType> ExpenseTypes { get; set; }
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<Purchase> Purchases { get; set; }
+        public DbSet<PurchaseDetails> PurchaseDetails { get; set; }
+        public DbSet<Stock> Stocks { get; set; }
     }
 }

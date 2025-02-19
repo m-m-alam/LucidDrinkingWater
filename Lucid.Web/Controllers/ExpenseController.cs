@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Lucid.Models;
 using Lucid.Services.Abstractions;
 using Lucid.Web.Models.ExpenseModels;
 using Lucid.Web.Models.ProductModels;
@@ -40,10 +41,26 @@ namespace Lucid.Web.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(CreateExpenseVm model)
         {
-            return View();
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var entity = _mapper.Map<Expense>(model);
+                    entity.CreatedBy = _currentUserService.UserId;
+                    entity.CreatedOn = DateTime.Now;
+                    _service.Add(entity);
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception ex) 
+            { 
+            }
+            model.ExpenseTypeSelectList = new SelectList(_expenseTypeService.GetAll().ToList(), "Id", "Name");
+            return View(model);
         }
         public IActionResult Edit(int? id)
         {
+            var entity = _service.GetById((int)id, x => x.ExpenseType);
             return View();
         }
         [HttpPost]

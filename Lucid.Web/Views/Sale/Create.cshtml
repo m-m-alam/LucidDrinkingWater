@@ -22,24 +22,24 @@
 
             <div class="row">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label asp-for="InvoiceNo" class="control-label"></label>
-                        <input name="model.InvoiceNo" id="InvoiceNo"  class="form-control" />
-                        <span asp-validation-for="InvoiceNo" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-md-4">
+                @*<div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="InvoiceNo" class="control-label"></label>
+                            <input name="model.InvoiceNo" id="InvoiceNo"  class="form-control" />
+                            <span asp-validation-for="InvoiceNo" class="text-danger"></span>
+                        </div>
+                    </div>*@
+                <div class="col-md-6">
                     <div class="form-group">
                         <label asp-for="CustomerId" class="control-label"></label>
-                        <select name="model.CustomerId" id="CustomerId" class="form-control" asp-items="@Model.Customers">
-                            <option>-Select-</option>
+                        <select name="model.CustomerId" id="CustomerId" class="form-control" asp-items="@Model.Customers" onchange="SetCustomerProductPrice()">
+                            <option value="">-Select-</option>
                         </select>
                         <span asp-validation-for="CustomerId" class="text-danger"></span>
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label>Date:</label>
                         <input type="text" class="form-control datetimepicker-input" name="model.SaleDate" value="@Model.SaleDate" id="datePicker" data-toggle="datetimepicker">
@@ -65,19 +65,21 @@
                         <tr id="row0">
 
                             <td>
-                                <select onchange="SetCustomerProductPrice(0)" name="model.SaleDetails[0].ProductId" id="ProductId0" class="form-control" asp-items="@Model.Products">
-                                    <option value="">Select Product</option>
-                                </select>
+                                <input type="text" name="model.SaleDetails[0].ProductId" id="ProductId0" class="form-control" hidden />
+                                <input type="text" id="productName" class="form-control" value="" readonly />
+                                @*<select onchange="SetCustomerProductPrice(0)" name="model.SaleDetails[0].ProductId" id="ProductId0" class="form-control" asp-items="@Model.Products">
+            <option value="">Select Product</option>
+        </select>*@
                             </td>
 
                             <td>
-                                <input type="text" name="model.SaleDetails[0].Price" id="Price0" class="form-control" value="" />
+                                <input type="text" name="model.SaleDetails[0].Price" id="Price0" class="form-control" readonly />
                             </td>
                             <td>
-                                <input type="text" name="model.SaleDetails[0].Delivery" id="Delivery0" onkeyup="SetTotalPrice(0),SetStockJar(0)" class="form-control" value="" /> @*onchange="SetTotalPrice(0)"*@
+                                <input type="text" name="model.SaleDetails[0].Delivery" id="Delivery0" onkeyup="SetTotalPrice(0),SetStockJarWithDelivery()" class="form-control" value="" /> @*onchange="SetTotalPrice(0)"*@
                             </td>
                             <td>
-                                <input type="text" name="model.SaleDetails[0].Return" id="Return0" onkeyup="SetStockJar(0)" class="form-control" value="" />
+                                <input type="text" name="model.SaleDetails[0].Return" id="Return0" onkeyup="SetStockJarWithReturn()" class="form-control" value="" />
                             </td>
                             <td>
                                 <input type="text" name="model.SaleDetails[0].Stock" id="Stock0" class="form-control" value="" readonly />
@@ -144,11 +146,13 @@
     <partial name="_ValidationScriptsPartial">
         <script>
             $(document).ready(function () {
+
+
                 var trNo = 0;
                 $("#addProduct").click(function(){
                     trNo = trNo + 1;
                     var tr = '<tr id="row' + trNo + '">' +
-                        '<td><select onchange="SetCustomerProductPrice(' + trNo +')" name="model.SaleDetails[' + trNo + '].ProductId" id="ProductId' + trNo + '" class="form-control">' +
+                        '<td><select onchange="SetProductPrice(' + trNo +')" name="model.SaleDetails[' + trNo + '].ProductId" id="ProductId' + trNo + '" class="form-control">' +
                         '<option value = "-1"> Select Product</option> ' +
                         '</select></td > ' +
                         '<td><input type = "text" name = "model.SaleDetails[' + trNo + '].Price" id = "Price' + trNo + '" class="form-control"/> </td>' +
@@ -170,9 +174,64 @@
                         }
                     })
                 })
+
+                SetInitialProduct();
+
             })
 
-            function SetCustomerProductPrice(trNo) {
+            function SetInitialProduct() {
+                $.ajax({
+                    type: "Get",
+                    url: "@Url.Action("GetProducts","Product")",
+                    success: function (res) {
+                        var product = res.find(item => item.name === "Water Jar");
+                        console.log(product);
+                        if (product != null) {
+                            $("#ProductId0").val(product.id)
+                            $("#productName").val(product.name)
+                        }
+
+                    },
+                    error: function (error) { }
+                });
+            }
+
+
+            function SetProductPrice(trNo) {
+                var productId = $('#ProductId' + trNo + ' option:selected').val();
+                $.ajax({
+                    type: "Get",
+                    url: "@Url.Action("GetById", "Product")",
+                    data: { id: productId },
+                    success: function (res) {
+                        console.log("product-", res)
+                        $('#Price' + trNo).val(res.price)
+                    },
+                    error: function (error) { }
+                })
+            }
+
+             function SetCustomerProductPrice() {
+                 var customerId = $("#CustomerId option:selected").val();
+                 if (customerId != "") {
+                     $.ajax({
+                         type: "Get",
+                         url: "@Url.Action("GetById", "Customer")",
+                         data: { id: customerId },
+                         success: function (res) {
+                             $('#Price0').val(res.price)
+                             $('#Stock0').val(res.stockJar)
+                         },
+                         error: function (error) { }
+                     })
+                 } else {
+                     $('#Price0').val("")
+                     $('#Stock0').val("")
+                 }
+            }
+
+
+            @*function SetCustomerProductPrice(trNo) {
                 var customerId = $("#CustomerId option:selected").val();
                 var productName = $('#ProductId' + trNo + ' option:selected').text();
                 console.log(productName)
@@ -202,7 +261,7 @@
                         error: function (error) { }
                     })
                 }
-            }
+            }*@
 
             function SetTotalPrice(trNo) {
                 var grandTotal = 0;
@@ -229,13 +288,19 @@
 
             }
 
-            function SetStockJar(trNo) {
-                var productName = $('#ProductId' + trNo + ' option:selected').text();
-                if (productName == "Water Jar") {
-                    var totalJar = oldJarStock + (parseFloat($("#Delivery" + trNo).val()) || 0);
-                    var stockJar = totalJar - (parseFloat($("#Return" + trNo).val())||0);
-                    $("#Stock" + trNo).val(stockJar);
-                }
-}
+            function SetStockJarWithDelivery() {                
+                var delivery = parseFloat($("#Delivery0").val()) || 0;
+                var returnJar = parseFloat($("#Return0").val() || 0);
+                var oldStock = parseFloat($("#Stock0").val() || 0);
+                var stockJar = ((delivery + oldStock) - returnJar)
+                $("#Stock0").val(stockJar);
+             }
+             function SetStockJarWithReturn() {        
+                var returnJar = parseFloat($("#Return0").val() || 0);
+                var oldStock = parseFloat($("#Stock0").val() || 0);
+                 var stockJar = oldStock - returnJar;
+                $("#Stock0").val(stockJar);
+             }
+
         </script>
 }

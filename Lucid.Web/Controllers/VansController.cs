@@ -18,13 +18,13 @@ namespace Lucid.Web.Controllers
     [Authorize]
     public class VansController : Controller
     {
-        private readonly IVanService _vanService;
+        private readonly IVanService _service;
         private readonly IMapper _mapper;
         protected readonly ICurrentUserService _currentUserService;
 
-        public VansController(IVanService vanService, IMapper mapper, ICurrentUserService currentUserService)
+        public VansController(IVanService service, IMapper mapper, ICurrentUserService currentUserService)
         {
-            _vanService = vanService;
+            _service = service;
             _mapper = mapper;
             _currentUserService = currentUserService;
         }
@@ -32,7 +32,7 @@ namespace Lucid.Web.Controllers
         // GET: Vans
         public IActionResult Index()
         {
-            var entities = _vanService.GetAll().ToList();
+            var entities = _service.GetAll(x => !x.IsDeleted && x.IsActive, null).ToList();
             var models = _mapper.Map<List<VanListVm>>(entities);
             return View(models);
         }
@@ -45,7 +45,7 @@ namespace Lucid.Web.Controllers
                 return NotFound();
             }
 
-            var van =  _vanService.GetById((int)id);
+            var van =  _service.GetById((int)id);
             if (van == null)
             {
                 return NotFound();
@@ -64,17 +64,23 @@ namespace Lucid.Web.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VanCreateVm van)
+        public async Task<IActionResult> Create(VanCreateVm model)
         {
             if (ModelState.IsValid)
             {
-                var entity = _mapper.Map<Van>(van);
+                var isExist = _service.IsExists(x=>x.Name == model.Name);
+                if (isExist)
+                {
+                    TempData["existModel"] = "Van Already Exist";
+                    return View(model);
+                }
+                var entity = _mapper.Map<Van>(model);
                 entity.CreatedBy = _currentUserService.UserId;
                 entity.CreatedOn = DateTime.Now;
-                _vanService.Add(entity);                
+                _service.Add(entity);                
                 return RedirectToAction(nameof(Index));
             }
-            return View(van);
+            return View(model);
         }
 
         //// GET: Vans/Edit/5
@@ -85,7 +91,7 @@ namespace Lucid.Web.Controllers
                 return NotFound();
             }
 
-            var entity =  _vanService.GetById((int)id);
+            var entity =  _service.GetById((int)id);
 
             if (entity == null)
             {
@@ -111,10 +117,16 @@ namespace Lucid.Web.Controllers
             {
                 try
                 {
+                    var isExist = _service.IsExists(x => (x.Name == model.Name && x.Id!=id));
+                    if (isExist)
+                    {
+                        TempData["existModel"] = "Van Already Exist";
+                        return View(model);
+                    }
                     var entity = _mapper.Map<Van>(model);
                     entity.LastModifiedBy = _currentUserService.UserId;
                     entity.LastModifiedOn = DateTime.Now;
-                    _vanService.Update(entity);
+                    _service.Update(entity);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -129,13 +141,13 @@ namespace Lucid.Web.Controllers
         [HttpGet]        
         public IActionResult Delete(int id)
         {
-            var entity = _vanService.GetById(id);
+            var entity = _service.GetById(id);
             //if (entity != null)
             //{
             //    entity.IsDeleted = true;
             //    _vanService.Update(entity);
             //}
-            _vanService.Delete(entity);
+            _service.Delete(entity);
             return RedirectToAction(nameof(Index));
         }
 

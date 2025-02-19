@@ -1,6 +1,7 @@
 ﻿using Lucid.Database;
 using Lucid.Models;
 using Lucid.Repositories.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lucid.Repositories
 {
@@ -11,6 +12,6 @@ namespace Lucid.Repositories
         public ExpenseRepository(ApplicationDbContext context) : base(context) 
         {
             _context = context;
-        }
+        }        
     }
 }

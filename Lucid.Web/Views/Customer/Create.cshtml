@@ -1,6 +1,7 @@
 ﻿@model Lucid.Web.Models.Customer.CustomerCreateVm
 @{
     ViewData["Title"] = "Create";
+    var existModel = TempData["existModel"];
 }
 
 <style>
@@ -17,6 +18,10 @@
         </div>
         <form class="form-horizontal" asp-action="Create">
             <div class="card-body">
+                @if (existModel != null)
+                {
+                    <h2 class="text-danger">@existModel</h2>
+                }
                 <div asp-validation-summary="ModelOnly" class="text-danger row"></div>
                 <div class="row">
                     <div class="col-md-6">
@@ -74,8 +79,8 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label asp-for="LastSaleDate"> </label>
-                            <input type="text" class="form-control datetimepicker-input" asp-for="LastSaleDate" id="datePicker" data-toggle="datetimepicker"/>
-                        </div>                        
+                            <input type="text" class="form-control datetimepicker-input" asp-for="LastSaleDate" id="datePicker" data-toggle="datetimepicker" />
+                        </div>
                     </div>
 
                     <div class="col-md-12">

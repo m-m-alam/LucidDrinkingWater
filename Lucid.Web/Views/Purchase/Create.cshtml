@@ -1,0 +1,195 @@
+﻿@model Lucid.Web.Models.PurchaseModels.CreatePurchaseVm
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+<style>
+    .card-title {
+        float: none;
+        text-align: center;
+        margin: 0;
+    }
+</style>
+
+<div class="card card-info mt-2">
+    <div class="card-header">
+        <h3 class="card-title">Add New Sale</h3>
+    </div>
+    <!-- form start -->
+    <form asp-action="Create" method="post">
+        <div class="card-body">
+
+            <div class="row">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="InvoiceNo" class="control-label"></label>
+                        <input name="model.InvoiceNo" id="InvoiceNo" class="form-control" />
+                        <span asp-validation-for="InvoiceNo" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Date:</label>
+                        <input type="text" class="form-control datetimepicker-input" name="model.PurchaseDate" value="@Model.PurchaseDate" id="datePicker" data-toggle="datetimepicker">
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <table class="table table-bodered">
+                    <thead>
+                        <tr>
+                            <th width="200px">Product Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th width="100px">action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="row0">
+
+                            <td>
+                                <select name="model.PurchaseDetails[0].ProductId" id="ProductId0" class="form-control" asp-items="@Model.Products">
+                                    <option value="">Select Product</option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <input type="text" name="model.PurchaseDetails[0].Price" id="Price0" onkeyup="SetTotalRowPrice(0)" class="form-control" value="" />
+                            </td>
+                            <td>
+                                <input type="text" name="model.PurchaseDetails[0].Quantity" id="Quantity0" onkeyup="SetTotalRowPrice(0)" class="form-control" value="" />
+                            </td>
+                            
+                            <td>
+                                <input type="text" id="TotalPrice0" class="form-control totalPrice" value="" />
+                            </td>
+
+                            <td>
+                                <a class="btn">Action</a>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td colspan="3" style="text-align:right;"><b>Other Cost :</b></td>
+                            <td class="text-right">
+                                <input type="text" class="text-right form-control" onkeyup="SetTotalAmount()" id="Cost">
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:right;"><b>Total Amount :</b></td>
+                            <td class="text-right">
+                                <input type="text" id="TotalAmount" class="text-right form-control" name="model.TotalAmount" readonly="readonly">
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:right;"><b>Payment :</b></td>
+                            <td class="text-right">
+                                <input type="text" class="text-right form-control" onkeyup="SetRemainAmount()" name="model.Payment" id="Payment">
+                            </td>
+                            <td></td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <input type="button" id="addProduct" class="btn btn-info" name="addProduct" value="Add New Product">
+                            </td>
+                            <td colspan="2" style="text-align:right;"><b>Remaining Amount:</b></td>
+                            <td class="text-right">
+                                <input type="text" id="RemainTotal" class="text-right form-control" name="RemainTotal" value="0.00" readonly="readonly">
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial">
+        <script>
+            $(document).ready(function () {
+                var trNo = 0;
+                $("#addProduct").click(function(){
+                    trNo = trNo + 1;
+                    var tr = '<tr id="row' + trNo + '">' +
+                        '<td><select onchange="SetCustomerProductPrice(' + trNo +')" name="model.PurchaseDetails[' + trNo + '].ProductId" id="ProductId' + trNo + '" class="form-control">' +
+                        '<option value = "-1"> Select Product</option> ' +
+                        '</select></td > ' +
+                        '<td><input type = "text" name = "model.PurchaseDetails[' + trNo + '].Price" id = "Price' + trNo + '" onkeyup="SetTotalRowPrice(' + trNo +')" class="form-control"/> </td>' +
+                        
+                        '<td><input type = "text" name = "model.PurchaseDetails[' + trNo + '].Quantity" id = "Quantity' + trNo + '" onkeyup="SetTotalRowPrice('+ trNo +')" class="form-control"/> </td>' +
+                        
+                        '<td><input type = "text" id = "TotalPrice' + trNo + '" class="form-control totalPrice"/> </td>' +
+                        '<td><a class="btn">Action</a></td>' +
+                        '</tr>';
+                    $("tbody").append(tr);
+
+                    $.ajax({
+                        method: "GET",
+                        url: "@Url.Action("GetProducts","Product")",
+                        success: function (data) {
+                            for (var i = 0; i < data.length; i++) {
+                                $('#ProductId' + trNo).append('<option value="' + data[i].id + '">' + data[i].name + '</option>');
+                            }
+                        }
+                    })
+                })
+            })
+
+           
+
+            function SetTotalRowPrice(trNo) {
+                var grandTotal = 0;
+                var quantity = $("#Quantity" + trNo).val() || 0;
+                var price = $("#Price" + trNo).val() || 0;
+                var cost = parseFloat($("#Cost").val()) || 0;
+                var rowTotalPrice = quantity * price;
+                $("#TotalPrice" + trNo).val(rowTotalPrice);
+
+                $(".totalPrice").each(function () {
+                    grandTotal += parseFloat(this.value)||0
+                });
+                grandTotal += cost;
+                $("#TotalAmount").val(grandTotal);
+
+            }
+             function SetTotalAmount() {
+                var total = 0;
+                 $(".totalPrice").each(function () {
+                     total += parseFloat(this.value) || 0
+                 });
+                 var cost = parseFloat($("#Cost").val()) || 0;
+                 total += cost;
+               
+                $("#TotalAmount").val(total);
+
+            }
+
+            
+             function SetRemainAmount() {
+                var totalAmount = parseFloat($("#TotalAmount").val());                
+                var payment = parseFloat($("#Payment").val())||0;
+                var remaingTotal = totalAmount - payment;
+                $("#RemainTotal").val(remaingTotal);
+
+            }
+        </script>
+}

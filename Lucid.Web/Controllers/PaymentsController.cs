@@ -7,23 +7,37 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Lucid.Database;
 using Lucid.Models;
+using AutoMapper;
+using Lucid.Services.Abstractions;
+using Lucid.Web.Services;
+using Lucid.Web.Models.PaymentModels;
 
 namespace Lucid.Web.Controllers
 {
     public class PaymentsController : Controller
     {
+        private readonly IPaymentService _service;
+        private readonly ICustomerService _customerService;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IMapper _mapper;
+
         private readonly ApplicationDbContext _context;
 
-        public PaymentsController(ApplicationDbContext context)
+        public PaymentsController(IPaymentService service, ICustomerService customerService, ICurrentUserService currentUserService, IMapper mapper)
         {
-            _context = context;
+            _service = service;
+            _customerService = customerService;
+            _currentUserService = currentUserService;
+            _mapper = mapper;
         }
 
         // GET: Payments
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Payments.Include(p => p.Customer);
-            return View(await applicationDbContext.ToListAsync());
+            var entities =_service.GetAll().ToList();
+            var models = _mapper.Map<List<ListPaymentVm>>(entities);
+            
+            return View(models);
         }
 
         // GET: Payments/Details/5
@@ -48,8 +62,10 @@ namespace Lucid.Web.Controllers
         // GET: Payments/Create
         public IActionResult Create()
         {
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Address");
-            return View();
+            var model = new CreatePaymentVm();
+            model.Customers = new SelectList(_customerService.GetAll().ToList(), "Id", "Name");
+            model.PaymentDate = DateTime.Now;
+            return View(model);
         }
 
         // POST: Payments/Create
@@ -57,33 +73,58 @@ namespace Lucid.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Amount,PaymentDate,CustomerId,CreatedBy,CreatedOn,LastModifiedBy,LastModifiedOn,Id,IsDeleted,IsActive")] Payment payment)
+        public async Task<IActionResult> Create(CreatePaymentVm model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(payment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    var entity = _mapper.Map<Payment>(model);
+                    entity.CreatedBy = _currentUserService.UserId;
+                    entity.CreatedOn = DateTime.Now;
+                    _service.Add(entity);
+                    var customer = _customerService.GetById(entity.CustomerId);
+                    customer.DueAmount = customer.DueAmount - model.Amount;
+                    customer.LastModifiedBy = _currentUserService.UserId;
+                    customer.LastModifiedOn = DateTime.Now;
+                    _customerService.Update(customer);
+                    return RedirectToAction(nameof(Index));
+                }
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Address", payment.CustomerId);
-            return View(payment);
+            catch (Exception ex) 
+            { 
+
+            }
+
+            model.Customers = new SelectList(_customerService.GetAll().ToList(), "Id", "Name");
+            return View(model);
         }
 
         // GET: Payments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var payment = await _context.Payments.FindAsync(id);
-            if (payment == null)
-            {
-                return NotFound();
+                var entity = _service.GetById((int)id);
+                if (entity == null)
+                {
+                    return NotFound();
+                }
+                var model = _mapper.Map<EditPaymentVm>(entity);
+                model.Customers = new SelectList(_customerService.GetAll().ToList(), "Id", "Name");
+                return View(model);
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Address", payment.CustomerId);
-            return View(payment);
+            catch (Exception ex) 
+            {
+                return View();
+            }
+           
+            
         }
 
         // POST: Payments/Edit/5
@@ -91,9 +132,9 @@ namespace Lucid.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Amount,PaymentDate,CustomerId,CreatedBy,CreatedOn,LastModifiedBy,LastModifiedOn,Id,IsDeleted,IsActive")] Payment payment)
+        public async Task<IActionResult> Edit(int id, EditPaymentVm model)
         {
-            if (id != payment.Id)
+            if (id != model.Id)
             {
                 return NotFound();
             }
@@ -102,63 +143,42 @@ namespace Lucid.Web.Controllers
             {
                 try
                 {
-                    _context.Update(payment);
-                    await _context.SaveChangesAsync();
+                   
+                    var entity = _mapper.Map<Payment>(model);
+                    double existingPayment = _service.GetById(entity.Id).Amount;
+                    entity.LastModifiedBy = _currentUserService.UserId;
+                    entity.LastModifiedOn = DateTime.Now;
+                    _service.Update(entity);
+                    var customer = _customerService.GetById(entity.CustomerId);
+                    customer.DueAmount = customer.DueAmount - model.Amount + existingPayment;
+                    customer.LastModifiedBy = _currentUserService.UserId;
+                    customer.LastModifiedOn = DateTime.Now;
+                    _customerService.Update(customer);
+                    return RedirectToAction(nameof(Index));
+
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!PaymentExists(payment.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                   
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Address", payment.CustomerId);
-            return View(payment);
+            model.Customers = new SelectList(_customerService.GetAll().ToList(), "Id", "Name");
+            return View(model);
         }
 
         // GET: Payments/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    var entity = _service.GetById((int)id);
+        //    //if (entity != null)
+        //    //{
+        //    //    entity.IsDeleted = true;
+        //    //    _vanService.Update(entity);
+        //    //}
+        //    _service.Delete(entity);
+        //    return RedirectToAction(nameof(Index));
+        //}
 
-            var payment = await _context.Payments
-                .Include(p => p.Customer)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (payment == null)
-            {
-                return NotFound();
-            }
-
-            return View(payment);
-        }
-
-        // POST: Payments/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var payment = await _context.Payments.FindAsync(id);
-            if (payment != null)
-            {
-                _context.Payments.Remove(payment);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool PaymentExists(int id)
-        {
-            return _context.Payments.Any(e => e.Id == id);
-        }
     }
 }

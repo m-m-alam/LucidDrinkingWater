@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Create";
+    var existModel = TempData["existModel"];
 }
 <style>
     .card-title {
@@ -22,6 +23,10 @@
             <!-- form start -->
             <form class="form-horizontal" asp-action="Create">
                 <div class="card-body">
+                    @if (existModel != null)
+                    {
+                        <h2 class="text-danger">@existModel</h2>
+                    }
                     <div asp-validation-summary="ModelOnly" class="text-danger row"></div>
                     <div class="form-group row">
                         <label asp-for="Name" class="col-sm-2 control-label"></label>

@@ -1,6 +1,7 @@
 ﻿@model Lucid.Web.Models.ExpenseTypeModels.EditExpenseTypeVm
 @{
     ViewData["Title"] = "Edit";
+    var existModel = TempData["existModel"];
 }
 <style>
     .card-title {
@@ -21,11 +22,15 @@
             <!-- form start -->
             <form class="form-horizontal" asp-action="Edit">
                 <div class="card-body">
+                    @if (existModel != null)
+                    {
+                        <h2 class="text-danger">@existModel</h2>
+                    }
                     <div asp-validation-summary="ModelOnly" class="text-danger row"></div>
                     <div class="form-group row" hidden>
-                       <input asp-for="Id" />
-                       <input asp-for="CreatedBy" />
-                       <input asp-for="CreatedOn" />
+                        <input asp-for="Id" />
+                        <input asp-for="CreatedBy" />
+                        <input asp-for="CreatedOn" />
                     </div>
                     <div class="form-group row">
                         <label asp-for="Name" class="col-sm-3 control-label"></label>

@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Lucid.Web.Models.ListStockVm>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="row">
+    <div class="col-12">
+        <!-- /.card -->
+        <div class="card">
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="listdatatbl" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Product)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Quantity)
+                            </th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Product)
+                                </td>
+                                     <td>
+                                    @Html.DisplayFor(modelItem => item.Quantity)
+                                </td>
+                                                         
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+<!-- /.row -->

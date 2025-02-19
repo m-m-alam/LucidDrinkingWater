@@ -7,6 +7,9 @@ using Lucid.Web.Models.ProductModels;
 using Lucid.Web.Models.Sales;
 using Lucid.Web.Models.ExpenseTypeModels;
 using Lucid.Web.Models.ExpenseModels;
+using Lucid.Web.Models.PaymentModels;
+using Lucid.Web.Models.PurchaseModels;
+using Lucid.Web.Models;
 
 namespace Lucid.Web.AutoMapperProfile
 {
@@ -63,14 +66,31 @@ namespace Lucid.Web.AutoMapperProfile
             CreateMap<ExpenseType, EditExpenseTypeVm>();
             CreateMap<EditExpenseTypeVm, ExpenseType>();
             
-             CreateMap<Expense, ListExpenseVm>();
+            CreateMap<Expense, ListExpenseVm>();
             CreateMap<ListExpenseVm, Expense>();
             CreateMap<Expense, CreateExpenseVm>();
             CreateMap<CreateExpenseVm, Expense>();
             CreateMap<Expense, EditExpenseVm>();
             CreateMap<EditExpenseVm, Expense>();
             
+            CreateMap<Payment, ListPaymentVm>()
+                .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer.Name));
+            CreateMap<ListPaymentVm, Payment>();
+            CreateMap<Payment, CreatePaymentVm>();
+            CreateMap<CreatePaymentVm, Payment>();
+            CreateMap<Payment, EditPaymentVm>();
+            CreateMap<EditPaymentVm, Payment>();
 
+            CreateMap<Purchase, CreatePurchaseVm>();
+            CreateMap<CreatePurchaseVm, Purchase>();
+            CreateMap<Purchase, ListPurchaseVm>();
+            CreateMap<ListPurchaseVm, Purchase>();
+
+            CreateMap<CreatePurchaseDetailsVm, PurchaseDetails>();
+            CreateMap<PurchaseDetails, CreatePurchaseDetailsVm>();
+
+            CreateMap<Stock, ListStockVm>()
+                .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product.Name));
 
         }
     }

@@ -43,6 +43,12 @@ namespace Lucid.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    var isExist = _service.IsExists(x => x.Name == model.Name);
+                    if (isExist)
+                    {
+                        TempData["existModel"] = "Product Already Exist";
+                        return View(model);
+                    }
                     var entity = _mapper.Map<Product>(model);
                     entity.CreatedBy = _currentUserService.UserId;
                     entity.CreatedOn = DateTime.Now;
@@ -86,6 +92,12 @@ namespace Lucid.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    var isExist = _service.IsExists(x => (x.Name == model.Name && x.Id != id));
+                    if (isExist)
+                    {
+                        TempData["existModel"] = "Product Already Exist";
+                        return View(model);
+                    }
                     var entity = _mapper.Map<Product>(model);
                     entity.LastModifiedBy = _currentUserService.UserId;
                     entity.LastModifiedOn = DateTime.Now;

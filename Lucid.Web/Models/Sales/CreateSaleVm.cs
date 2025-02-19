@@ -11,7 +11,7 @@ namespace Lucid.Web.Models.Sales
             SaleDetails = new List<CreateSaleDetailsVm>();
         }
         [Display(Name = "Invoice No")]
-        public string InvoiceNo { get; set; }
+        public string? InvoiceNo { get; set; }
         [Display(Name = "Customer")]
         public int CustomerId { get; set; }
         [Display(Name = "Date")]

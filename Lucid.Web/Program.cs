@@ -56,6 +56,12 @@ builder.Services.AddTransient<IExpenseTypeRepository, ExpenseTypeRepository>();
 builder.Services.AddTransient<IExpenseService, ExpenseService>();
 builder.Services.AddTransient<IExpenseRepository, ExpenseRepository>();
 
+builder.Services.AddTransient<IStockService, StockService>();
+builder.Services.AddTransient<IStockRepository, StockRepository>();
+
+builder.Services.AddTransient<IPurchaseService, PurchaseService>();
+builder.Services.AddTransient<IPurchaseRepository, PurchaseRepository>();
+
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
