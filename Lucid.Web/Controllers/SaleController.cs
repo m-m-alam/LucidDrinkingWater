@@ -66,7 +66,7 @@ namespace Lucid.Web.Controllers
                     foreach (var item in model.SaleDetails)
                     {
                         var product = _productService.GetById(item.ProductId);
-                        if (product.Name == "Water Jar")
+                        if (product.Name.ToLower() == "water jar")
                         {
 
                             customer.StockJar = item.Stock.GetValueOrDefault();

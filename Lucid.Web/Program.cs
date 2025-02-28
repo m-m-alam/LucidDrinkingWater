@@ -62,6 +62,8 @@ builder.Services.AddTransient<IStockRepository, StockRepository>();
 builder.Services.AddTransient<IPurchaseService, PurchaseService>();
 builder.Services.AddTransient<IPurchaseRepository, PurchaseRepository>();
 
+builder.Services.AddTransient<IReportService, ReportService>();
+
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();

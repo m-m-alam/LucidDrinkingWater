@@ -1,0 +1,100 @@
+﻿@model List<Lucid.ViewModel.SalesReportVm>
+@{
+    ViewData["Title"] = "SalesReport";
+}
+
+
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- form start -->
+        <form asp-action="SalesReport" method="get">
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Start Date:</label>
+                                <input type="text" class="form-control datetimepicker-input" name="startDate" id="datePicker" data-toggle="datetimepicker" value="@(ViewBag.startDate)">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>End Date:</label>
+                                <input type="text" class="form-control datetimepicker-input" name="endDate" id="datePicker2" data-toggle="datetimepicker" value="@(ViewBag.endDate)">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Customer</label>
+                                <select class="form-control" name="customerId" asp-items="@(ViewBag.customers)">
+                                    <option>Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <br />
+                            <button type="submit" class="btn btn-success mt-2" value="Submit">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Payment</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var items in Model.GroupBy(x => x.Date))
+                {
+                    int i = 1;
+                    foreach (var item in items)
+                    {
+
+                        <tr>
+                            @if (items.Count() == 1)
+                            {
+                                <td>@(items.Key.ToString("MMM-dd-yy"))</td>
+                            }
+                            else if (items.Count() > 1 && i == 1)
+                            {
+                                <td rowspan="@items.Count()">@(items.Key.ToString("MMM-dd-yy"))</td>
+                            }
+
+                            <td>@(item.Product)</td>
+                            <td>@(item.Price)</td>
+                            <td>@(item.Quantity)</td>
+                            <td></td>
+                        </tr>
+                        i++;
+                    }
+
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+
+        })
+    </script>
+}

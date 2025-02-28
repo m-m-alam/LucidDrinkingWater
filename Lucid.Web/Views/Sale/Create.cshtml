@@ -67,9 +67,6 @@
                             <td>
                                 <input type="text" name="model.SaleDetails[0].ProductId" id="ProductId0" class="form-control" hidden />
                                 <input type="text" id="productName" class="form-control" value="" readonly />
-                                @*<select onchange="SetCustomerProductPrice(0)" name="model.SaleDetails[0].ProductId" id="ProductId0" class="form-control" asp-items="@Model.Products">
-            <option value="">Select Product</option>
-        </select>*@
                             </td>
 
                             <td>
@@ -196,7 +193,6 @@
                 });
             }
 
-
             function SetProductPrice(trNo) {
                 var productId = $('#ProductId' + trNo + ' option:selected').val();
                 $.ajax({
@@ -211,7 +207,7 @@
                 })
             }
 
-             function SetCustomerProductPrice() {
+            function SetCustomerProductPrice() {
                  var customerId = $("#CustomerId option:selected").val();
                  if (customerId != "") {
                      $.ajax({
@@ -229,39 +225,6 @@
                      $('#Stock0').val("")
                  }
             }
-
-
-            @*function SetCustomerProductPrice(trNo) {
-                var customerId = $("#CustomerId option:selected").val();
-                var productName = $('#ProductId' + trNo + ' option:selected').text();
-                console.log(productName)
-                var productId = $('#ProductId' + trNo + ' option:selected').val();
-                if (productName == "Water Jar") {
-                    $.ajax({
-                        type: "Get",
-                        url: "@Url.Action("GetById", "Customer")",
-                        data: { id: customerId },
-                        success: function (res) {
-                            console.log("customer - ",res)
-                            oldJarStock = res.stockJar;
-                            $('#Price' + trNo).val(res.price)
-                            $('#Stock' + trNo).val(res.stockJar)
-                        },
-                        error: function (error) { }
-                    })
-                } else {
-                    $.ajax({
-                        type: "Get",
-                        url: "@Url.Action("GetById", "Product")",
-                        data: { id: productId },
-                        success: function (res) {
-                            console.log("product-", res)
-                            $('#Price' + trNo).val(res.price)
-                        },
-                        error: function (error) { }
-                    })
-                }
-            }*@
 
             function SetTotalPrice(trNo) {
                 var grandTotal = 0;
@@ -294,8 +257,9 @@
                 var oldStock = parseFloat($("#Stock0").val() || 0);
                 var stockJar = ((delivery + oldStock) - returnJar)
                 $("#Stock0").val(stockJar);
-             }
-             function SetStockJarWithReturn() {        
+            }
+
+            function SetStockJarWithReturn() {        
                 var returnJar = parseFloat($("#Return0").val() || 0);
                 var oldStock = parseFloat($("#Stock0").val() || 0);
                  var stockJar = oldStock - returnJar;

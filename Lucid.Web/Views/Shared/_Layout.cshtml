@@ -450,30 +450,31 @@
                                 </li>
                             </ul>
                         </li>
-                        @*
+                       
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>
-                                    Customar Type
+                                    Reports
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a asp-action="Index" asp-controller="CustomerType" class="nav-link active">
+                                    <a asp-action="SalesReport" asp-controller="Report" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Customer Type List</p>
+                                        <p>Customer Report</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a asp-action="Create" asp-controller="CustomerType" class="nav-link">
+                                    <a asp-action="Create" asp-controller="Report" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Add Customer Type</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
+                        @*
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -615,6 +616,10 @@
             $('#datePicker').datetimepicker({
                 format: 'L'
             });
+            $('#datePicker2').datetimepicker({
+                format: 'L',
+            });
+
         });
     </script>
    
